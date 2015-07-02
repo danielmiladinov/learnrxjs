@@ -46,3 +46,17 @@ function printAllNamesInAnArray (console) {
 
 // Ask yourself this question: did we need to specify the order in which the names were printed? If not, why do it?
 
+
+// Exercise 2: Use forEach to print all the names in an array
+// Let's repeat the previous exercise using the forEach function.
+
+function printAllNamesInArrayUsingForEach (console) {
+  var names = ["Ben", "Jafar", "Matt", "Priya", "Brian"];
+
+  names.forEach(function(name) {
+    console.log(name);
+  });
+}
+
+// Notice that forEach let's us specify what we want to happen to each item in the array,
+// but hides how the array is traversed.
