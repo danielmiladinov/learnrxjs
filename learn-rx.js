@@ -119,3 +119,17 @@ function projectIdAndTitlePairs () {
 // 2. Add each item's projected value to a new array
 
 // Why not abstract away how these operations are carried out?
+
+
+// Exercise 4: Implement map()
+
+// To make projections easier, let's add a map() function to the Array type. Map accepts the projection function to be
+// applied to each item in the source array, and returns the projected array.
+Array.prototype.map = function (projectionFunction) {
+  var results = [];
+  this.forEach(function (itemInArray) {
+    results.push(projectionFunction(itemInArray));
+  });
+
+  return results;
+};
