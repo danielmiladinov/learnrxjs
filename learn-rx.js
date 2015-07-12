@@ -388,3 +388,21 @@ function flattenMovieListsWithNestedForEachLoops () {
 // Unfortunately it's exactly this type of low-level operation that we've been trying to abstract away with functions
 // like map() and filter(). Can we define a function that's abstract enough to express our intent to flatten a tree,
 // without specifying too much information about how to carry out the operation?
+
+
+// Exercise 10: Implement mergeAll()
+
+// Let's add a mergeAll() function to the Array type. The mergeAll() function iterates over each sub-array in the array
+// and collects the results in a new, flat array. Note: the mergeAll() function expects that each item in the array will
+// be another array.
+Array.prototype.mergeAll = function() {
+  var results = [];
+  this.forEach(function (subArray) {
+    subArray.forEach(function (subItem) { results.push(subItem); });
+  });
+
+  return results;
+};
+
+// Merge is a very simple function, so much so that it may not be obvious yet how it can be combined with map()
+// to query a tree. Let's try an example...
