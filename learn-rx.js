@@ -569,3 +569,17 @@ function retrieveIdTitleAndBoxartForEveryVideo () {
 // Fantastic job! Now you've learned to use mergeAll() alongside map() and filter() to queries trees. Notice that map()
 // and mergeAll() are very commonly chained together.
 // Let's create a small helper function to help us with this common pattern.
+
+
+// Exercise 13: Implement flatMap()
+
+// Nearly every time we flatten a tree we chain map() and mergeAll(). Sometimes, if we're dealing with a tree several
+// levels deep, we'll repeat this combination many times in our code. To save on typing, let's create a flatMap function
+// that's just a map operation, followed by a mergeAll.
+Array.prototype.flatMap = function (projectionFunctionThatReturnsArray) {
+  return this.
+    map(function (item) { return projectionFunctionThatReturnsArray(item); }).
+    mergeAll();
+};
+
+// Now, instead of using map().mergeAll() to flatten a tree, we can just use flatMap helper function.
