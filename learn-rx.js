@@ -2036,3 +2036,100 @@ function sequencingHTTPRequestsWithCallbacks (window, $, showMovieLists, showErr
 // from having to track Event Subscriptions. We'll also see that Observable gives us the same error propagation
 // semantics in asynchronous programs that we expect in synchronous programs. Finally we'll learn that by converting
 // callback-based APIs to Observables, we can query them along with Events to build much more expressive programs.
+
+
+// Exercise 37: Traversing callback-based Asynchronous APIs
+
+// If a callback API were a sequence, what kind of sequence would it be? We've seen that UI Event sequences can contain
+// anywhere from 0 to infinite items, but will never complete on their own.
+
+//  mouseMoves === seq([ {x: 23, y: 55},,,,,,,{x: 44, y: 99},,,{x:55,y:99},,,{x: 54, y:543},,, ]);
+
+// In contrast, if we were to convert output from the $.getJSON() function we've been using into a sequence it would
+// always return a sequence that completes after sending a single item.
+
+//  getJSONAsObservable("http://api-global.netflix.com/abTestInformation") === seq([ { urlPrefix: "billboardTest" } ]);
+
+// It might seem strange to create sequences that contain only one object. We could introduce an Observable-like type
+// specifically for scalar values, but that would make callback-based APIs more difficult to query with Events.
+// Thankfully, an Observable sequence is flexible enough to model both.
+
+// So how do we convert a callback API into an Observable sequence? Unfortunately, because callback-based APIs vary
+// so much in their interfaces, we can't create a conversion function like we did with fromEvent(). However there is a
+// more flexible function we can use to build Observable sequences...
+
+// Observable.create() is powerful enough to convert any asynchronous API into an Observable. Observable.create()
+// relies on the fact that all asynchronous APIs have the following semantics:
+
+// 1. The client needs to be able to receive data.
+// 2. The client needs to be able to receive error information.
+// 3. The client needs to be able to be alerted that the operation is complete.
+// 4. The client needs to be able to indicate that they're no longer interested the result of the operation.
+
+// In the following example, we'll use the Observable.create() function to create an Observable that issues a request
+// to getJSON when it's traversed.
+function traversingCallbackBasedAsynchronousAPIs (window, $) {
+  var getJSON = function(url) {
+    return Observable.create(function(observer) {
+      var subscribed = true;
+
+      $.getJSON(url, {
+        success:
+          function(data) {
+            // If client is still interested in the results, send them.
+            if (subscribed) {
+              // Send data to the client
+              observer.onNext(data);
+              // Immediately complete the sequence
+              observer.onCompleted();
+            }
+          },
+        error: function(ex) {
+          // If client is still interested in the results, send them.
+          if (subscribed) {
+            // Inform the client that an error occurred.
+            observer.onError(ex);
+          }
+        }
+      });
+
+      // Definition of the Subscription objects dispose() method.
+      return function() {
+        subscribed = false;
+      }
+    });
+  };
+
+  var subscription =
+    getJSON("http://api-global.netflix.com/abTestInformation").forEach(
+      // observer.onNext()
+      function(data) {
+        alert(JSON.stringify(data));
+      },
+      // observer.onError()
+      function(err) {
+        alert(err)
+      },
+      // observer.onCompleted()
+      function() {
+        alert("The asynchronous operation has completed.")
+      }
+    );
+}
+
+// Understand that the function passed to Observable.create() is the definition of the forEach() function for this
+// Observable. In other words, all we have to do to define an Observable is to define its traversal function.
+// Notice that although we pass three functions to the Observable's forEach() function, the function we pass to
+// Observable.create() accepts only one value: an Observer. An Observer is just a triple containing three handlers:
+
+// * The onNext() handler used to send data to the client.
+// * The onError() handler used to send error information to the client.
+// * The onCompleted() handler used to inform the client that the sequence has completed.
+
+// The three handlers we pass to forEach() are packaged together into a single Observer object for convenience.
+// Finally Observable.create() returns a function that defines the dispose() method of the Subscription object during
+// Traversal. Like the Observer, the Observable.create() function creates the Subscription object for us and uses our
+// function as the dispose() definition.
+
+// Now that we've built a version of the getJSON function that returns an Observable sequence,
+// let's use it to improve our solution to the previous exercise...
