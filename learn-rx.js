@@ -2133,3 +2133,53 @@ function traversingCallbackBasedAsynchronousAPIs (window, $) {
 
 // Now that we've built a version of the getJSON function that returns an Observable sequence,
 // let's use it to improve our solution to the previous exercise...
+
+
+// Exercise 38: Sequencing HTTP requests with Observable
+
+// Let's use the getJSON function that returns Observables, and the Observable.fromEvent() to complete
+// the exercise we completed earlier.
+function sequencingHTTPRequestsWithObservable(window, getJSON, showMovieLists, showError) {
+  var movieListsSequence = Observable.zip(
+    getJSON("http://api-global.netflix.com/abTestInformation").flatMap(function (abTestInformation) {
+      return Observable.zip(
+        getJSON("http://api-global.netflix.com/" + abTestInformation.urlPrefix + "/config").
+          flatMap(function (config) {
+            if (config.showInstantQueue) {
+              return getJSON("http://api-global.netflix.com/" + abTestInformation.urlPrefix + "/queue").
+                map(function (queueMessage) {
+                  return queueMessage.list;
+                });
+            }
+            else {
+              return Observable.returnValue(undefined);
+            }
+          }),
+        getJSON("http://api-global.netflix.com/" + abTestInformation.urlPrefix + "/movieLists"),
+        function (queue, movieListsMessage) {
+          var copyOfMovieLists = Object.create(movieListsMessage.list);
+          if (queue !== undefined) {
+            copyOfMovieLists.push(queue);
+          }
+
+          return copyOfMovieLists;
+        });
+    }),
+    Observable.fromEvent(window, "load"),
+    function (movieLists, loadEvent) {
+      return movieLists;
+    }
+  );
+
+  movieListsSequence.forEach(
+    function (movieLists) {
+      showMovieLists(movieLists);
+    },
+    function (err) {
+      showError(err);
+    }
+  );
+}
+
+// Almost every workflow in a web application starts with an event, continues with an HTTP request,
+// and results in a state change. Now we know how express the first two tasks elegantly.
