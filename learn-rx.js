@@ -2183,3 +2183,24 @@ function sequencingHTTPRequestsWithObservable(window, getJSON, showMovieLists, s
 
 // Almost every workflow in a web application starts with an event, continues with an HTTP request,
 // and results in a state change. Now we know how express the first two tasks elegantly.
+
+
+// Exercise 40: Throttle Input
+
+// When dealing with user input, there will be times when the user's input is too noisy, and will potentially clog your
+// servers with extraneous requests. We want the ability to throttle the users' input so that if they interacting for
+// one second, then we will get the user input. Let's say for example, the user clicks a button once too many times upon
+// saving and we only want to fire after they've stopped for a second.
+
+
+// seq([1,,,2,,,3,,,4,,,5,,,6,,,]).throttle(1000 */ms */) ===
+// seq([,,,,,,,,3,,,,,,,,,,,6,,,]);
+function throttleInput(clicks, saveData, name) {
+  return clicks.
+    throttle(1000).
+    flatMap(function () {
+      return saveData(name);
+    });
+}
+
+// Now that we know how to throttle input, let's take a look at another problem where throttling data is important...
