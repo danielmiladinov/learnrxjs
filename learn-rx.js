@@ -2204,3 +2204,35 @@ function throttleInput(clicks, saveData, name) {
 }
 
 // Now that we know how to throttle input, let's take a look at another problem where throttling data is important...
+
+
+// Exercise 41: Autocomplete Box
+
+// One of the most common problems in web development is the autocomplete box. This seems like it should be an easy
+// problem, but is actually quite challenging. For example, how do we throttle the input? How do we make sure we're not
+// getting out or order requests coming back? For example if I type "react" then type "reactive" I want "reactive" to be
+// my result, regardless of which actually returned first from the service.
+
+// In the example below, you will be receiving a sequence of key presses, a textbox, and a function when called returns
+// an array of search results.
+
+
+// getSearchResultSet('react') === seq[,,,["reactive", "reaction","reactor"]]
+// keyPresses === seq['r',,,,,'e',,,,,,'a',,,,'c',,,,'t',,,,,]
+function autocompleteBox(getSearchResultSet, keyPresses, textBox) {
+
+  var getSearchResultSets =
+    keyPresses.
+      map(function () {
+        return textBox.value;
+      }).
+      throttle(1000).
+      flatMap(function (text) {
+        return getSearchResultSet(text).takeUntil(keyPresses);
+      });
+
+  return getSearchResultSets;
+}
+
+// Now that we're able to query with our throttled input, you'll still notice one slight problem. If you hit your arrow
+// keys or any other non character key, the request will still fire. How do we prevent that?
