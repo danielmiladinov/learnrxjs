@@ -2301,3 +2301,10 @@ function retryThrice(erroredSequence) {
 }
 
 // Now that we know how to get only the distinct input, let's see how it applies to our autocomplete example...
+
+
+// Exercise 45: Catching Exceptions
+function catchExceptionsAndReturnEmptyArray(erroredSequence) {
+  return erroredSequence.catch(Rx.Observable.return([]));
+}
+
