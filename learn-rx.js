@@ -2293,3 +2293,11 @@ function autocompletBoxBugsFixed(getSearchResultSet, keyPresses, textBox) {
 
 // With just this little amount of code, we're able to produce a fully functioning autocomplete scenario. But there are
 // other outstanding questions, such as error handling. How can we handle failure and retry if necessary?
+
+
+// Exercise 44: Retrying after errors
+function retryThrice(erroredSequence) {
+  return erroredSequence.retry(3);
+}
+
+// Now that we know how to get only the distinct input, let's see how it applies to our autocomplete example...
